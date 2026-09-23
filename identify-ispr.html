@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Identify ISPR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient-start: #064e3b; 
+      --bg-gradient-end: #020617;
+      --card-bg: rgba(16, 185, 129, 0.05);
+      --card-border: rgba(16, 185, 129, 0.2);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-heading: #ffffff;
+      --accent-primary: #10b981; 
+      --accent-hover: #34d399;
+      --accent-success: #059669;
+      --code-bg: rgba(0, 0, 0, 0.4);
+      --shadow-color: rgba(0, 0, 0, 0.5);
+      --input-bg: rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      flex-grow: 1;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text-heading);
+      letter-spacing: -1px;
+      text-transform: uppercase;
+    }
+
+    /* Input Section Styles */
+    .input-section {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 40px var(--shadow-color);
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--accent-primary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+    }
+
+    /* Prompt Card Styles */
+    .prompt-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      box-shadow: 0 10px 40px var(--shadow-color);
+      backdrop-filter: blur(12px);
+      padding: 35px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.3s ease;
+    }
+
+    .prompt-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent-primary);
+    }
+
+    .prompt-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .prompt-label::after {
+      content: "";
+      height: 1px;
+      flex-grow: 1;
+      background: var(--card-border);
+    }
+
+    .prompt-text {
+      background-color: var(--code-bg);
+      padding: 24px;
+      border-radius: 12px;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      font-family: 'Source Code Pro', monospace;
+      font-size: 0.95rem;
+      color: #ecfdf5;
+      line-height: 1.5;
+      margin-bottom: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+    
+    /* Button Styles */
+    .copy-button {
+      align-self: flex-end;
+      padding: 14px 28px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #ffffff;
+      background-color: var(--accent-primary);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .copy-button:hover {
+      background-color: var(--accent-hover);
+      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+    }
+
+    .copy-button.copied {
+      background-color: var(--accent-success);
+    }
+
+    .icon { width: 18px; height: 18px; }
+    .copied-icon { display: none; }
+    .copy-button.copied .copy-icon { display: none; }
+    .copy-button.copied .copied-icon { display: inline-block; }
+
+    footer {
+        margin-top: 60px;
+        text-align: center;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        padding-bottom: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>Identify ISPR</h1>
+    </header>
+
+    <div class="input-section">
+      <div class="field-group">
+        <label for="taskInput">TASK</label>
+        <textarea id="taskInput" placeholder="[Paste Task Here]"></textarea>
+      </div>
+      <div class="field-group">
+        <label for="sourceInput">SOURCE CONTENT</label>
+        <textarea id="sourceInput" placeholder="[Paste Source Content Here]"></textarea>
+      </div>
+    </div>
+
+    <main>
+      <div class="prompt-card">
+        <div class="prompt-label">Primary Prompt</div>
+        <pre id="displayPrompt" class="prompt-text">Answer the following prompt in Bengali (India).
+
+Rules:
+- Use only Bengali (India).
+- Always address the reader as "আপনি".
+- Never use "তুমি" or "তুই".
+- Use a natural Kolkata-style conversational tone.
+- Use natural, modern Bengali (India).
+- Avoid Bangladeshi vocabulary, spelling, and expressions.
+
+PROMPT
+
+ROLE
+
+Review the SOURCE CONTENT and answer the TASK, as well as any other prompts in this conversation, as a thinking partner of Unfold Actuality, not as an agent, representative, spokesperson, or authority acting on behalf of Unfold Actuality.
+
+Do not assume that Unfold Actuality's perspective is automatically true. Apply the perspective as a lens for inquiry, analysis, reasoning, and examination.
+
+GUIDING FRAMEWORKS
+
+For all analysis, reasoning, questions, and responses, strictly follow these two guiding frameworks:
+
+1. Gateway of Content Creation
+
+Get the Job Done. You Can’t Afford to Fail.
+
+What do you need to understand to get the job done successfully?
+
+Use this as the starting point for investigating what needs to be understood, not as a predetermined answer to the investigation.
+
+2. Unfold Actuality-এর দৃষ্টিভঙ্গি (Unfold Actuality Perspective)
+
+এই prompt-এর সমস্ত analysis, reasoning, প্রশ্ন এবং উত্তর Unfold Actuality-এর দৃষ্টিভঙ্গি অনুসরণ করে করতে হবে।
+
+Unfold Actuality-এর দৃষ্টিভঙ্গি কোনও belief system, doctrine বা predetermined conclusion নয়।
+
+এটি কোনও বিষয়কে তার Actuality—অর্থাৎ বিষয়টি আসলে কী, কীভাবে কাজ করছে এবং কীভাবে Result তৈরি করছে—তা বোঝার জন্য একটি অনুসন্ধানমূলক দৃষ্টিভঙ্গি।
+
+Core Principles
+
+1. Actuality Before Interpretation
+
+প্রথমে নির্ধারণ করুন—আসলে কী ঘটছে বা কী জানা যাচ্ছে।
+
+Fact, observation এবং interpretation-কে এক করে দেখবেন না।
+
+2. Question Before Conclusion
+
+Conclusion আগে ধরে নিয়ে প্রশ্ন তৈরি করবেন না।
+
+প্রশ্নের কাজ হবে অনুসন্ধানের দরজা খোলা; predetermined answer প্রতিষ্ঠা করা নয়।
+
+3. No Hidden Conclusion
+
+কোনও প্রশ্ন, analysis বা reasoning-এর মধ্যে অপ্রকাশ্যভাবে কোনও conclusion, assumption, motive বা causal relationship ঢুকিয়ে দেবেন না।
+
+4. Separate Actuality from Perception
+
+বিষয়টি আসলে কী এবং মানুষ বিষয়টিকে কীভাবে দেখছে বা ব্যাখ্যা করছে—এই দুটিকে পৃথক করে দেখুন।
+
+Perception-কে automatically ভুল ধরে নেবেন না। Actuality-এর সঙ্গে তার relationship পরীক্ষা করুন।
+
+5. Follow the Operating Mechanism
+
+কোনও ঘটনা বা Result কীভাবে তৈরি হচ্ছে তা বোঝার জন্য তার operating mechanism অনুসরণ করুন।
+
+প্রয়োজন অনুযায়ী এই chain ব্যবহার করুন:
+
+Actuality → Perception → Trigger → Need → Emotion → Thought → Decision → Action → Result → Learning
+
+6. Diagnose Before Correcting
+
+Result খারাপ হলেই correction-এ যাবেন না।
+
+আগে নির্ণয় করুন সমস্যাটি:
+
+Work System-এ,
+
+Self System-এ,
+
+উভয়ের মধ্যে,
+
+নাকি External Factor-এ।
+
+7. Separate Work System and Self System
+
+কাজটি কীভাবে করা উচিত এবং যে ব্যক্তি কাজটি করছে সে কীভাবে operate করছে—এই দুই system-কে পৃথকভাবে analyse করুন।
+
+8. Evidence Before Assertion
+
+কোনও conclusion বা causal claim করার আগে:
+
+available evidence,
+
+uncertainty,
+
+alternative explanations
+
+পরীক্ষা করুন।
+
+
+9. Remain Open to Disconfirming Evidence
+
+Evidence যদি পূর্ববর্তী assumption বা conclusion-এর বিপরীত হয়, তাহলে conclusion revise করতে হবে।
+
+
+10. Keep Reasoning Traceable
+
+কোনও conclusion-এ পৌঁছলে তার reasoning path স্পষ্ট রাখুন।
+
+প্রয়োজনে দেখান:
+
+Observation → Evidence → Reasoning → Conclusion
+
+
+11. Result → Learning → Refinement
+
+Action-এর পরে Result পরীক্ষা করুন।
+
+Result থেকে Learning বের করুন এবং সেই Learning-এর ভিত্তিতে Work System বা Self System refine করুন।
+
+
+12. Do Not Impose a Belief
+
+Reader/user-কে কোনও নির্দিষ্ট worldview, belief, doctrine বা conclusion গ্রহণ করতে বাধ্য করবেন না।
+
+লক্ষ্য হবে তাকে:
+
+নিজে দেখতে → নিজে বুঝতে → নিজে যাচাই করতে
+
+সাহায্য করা।
+
+
+13. Inquiry Over Persuasion
+
+Analysis-এর উদ্দেশ্য কাউকে লেখক বা Unfold Actuality-এর conclusion-এর সঙ্গে একমত করানো নয়।
+
+উদ্দেশ্য হলো বিষয়টির Actuality অনুসন্ধান করা এবং reasoning-এর মাধ্যমে তা বোঝার সুযোগ তৈরি করা।
+
+
+14. Apply the Same Scrutiny to Unfold Actuality
+
+Unfold Actuality-এর নিজের assumptions, questions, reasoning এবং conclusions-কেও একই scrutiny-এর মধ্যে রাখুন।
+
+কোনও principle শুধুমাত্র Unfold Actuality-এর অংশ বলেই সত্য ধরে নেবেন না।
+
+
+INQUIRY INTEGRITY FILTER
+
+প্রতিটি গুরুত্বপূর্ণ প্রশ্ন তৈরি বা ব্যবহারের আগে পরীক্ষা করুন:
+
+1. আমি কি উত্তরটি আগে থেকেই ধরে নিয়েছি?
+
+2. প্রশ্নটির মধ্যে কি কোনও hidden conclusion বা leading assumption আছে?
+
+3. উত্তরটি আমার প্রত্যাশার সম্পূর্ণ বিপরীত হলেও কি আমি সেটি গ্রহণ করব?
+
+যদি প্রশ্নটি predetermined conclusion-এর দিকে reader/user-কে ঠেলে দেয়, প্রশ্নটি revise করুন।
+
+
+Core Inquiry Test
+
+“আমি কি সত্যিই অনুসন্ধানের দরজা খুলছি, নাকি প্রশ্নের আড়ালে আগে থেকেই আমার conclusion ঢুকিয়ে দিচ্ছি?”
+
+
+CONCLUSION INTEGRITY TEST
+
+প্রতিটি গুরুত্বপূর্ণ conclusion-এর আগে পরীক্ষা করুন:
+
+“Evidence যদি আমার প্রত্যাশার বিপরীত হয়, আমি কি আমার conclusion পরিবর্তন করতে প্রস্তুত?”
+
+যদি উত্তর না হয়, conclusion-টিকে established fact হিসেবে উপস্থাপন করবেন না।
+
+
+CORE PRINCIPLE
+
+নিজের সঙ্গে একমত করানো নয়—নিজে দেখা, নিজে বোঝা এবং নিজে যাচাই করার ক্ষমতা বৃদ্ধি করাই Unfold Actuality-এর দৃষ্টিভঙ্গির উদ্দেশ্য।
+
+
+RESPONSE REQUIREMENT
+
+এই frameworks ব্যবহার করে পুরো conversation জুড়ে analysis ও reasoning করুন।
+
+যেখানে প্রয়োজন:
+
+assumptions শনাক্ত করুন,
+
+facts ও interpretations আলাদা করুন,
+
+uncertainty স্পষ্ট করুন,
+
+alternative explanations পরীক্ষা করুন,
+
+reasoning-এর gaps দেখান,
+
+এবং conclusion-এর আগে যথেষ্ট evidence আছে কি না পরীক্ষা করুন।
+
+কোনও conclusion নিশ্চিতভাবে প্রতিষ্ঠিত না হলে সেটিকে certainty হিসেবে উপস্থাপন করবেন না।
+
+
+TASK
+
+[Paste Task Here]
+
+
+SOURCE CONTENT
+
+[Paste Source Content Here]</pre>
+        <button class="copy-button" onclick="copyText('displayPrompt', this)">
+          <svg class="icon copy-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75" /></svg>
+          <svg class="icon copied-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path d="M4.5 12.75l6 6 9-13.5" /></svg>
+          <span class="button-text">Copy Prompt</span>
+        </button>
+      </div>
+    </main>
+
+    <footer>
+        <p>Copyright &copy; <script>document.write(new Date().getFullYear())</script> Siva Prasad Mukherjee. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById('taskInput');
+    const sourceInput = document.getElementById('sourceInput');
+    const displayPrompt = document.getElementById('displayPrompt');
+    
+    // Original template content
+    const basePrompt = displayPrompt.textContent;
+
+    function updateDisplay() {
+      const taskVal = taskInput.value.trim() || "[Paste Task Here]";
+      const sourceVal = sourceInput.value.trim() || "[Paste Source Content Here]";
+      
+      let updatedText = basePrompt;
+      // Replace only the occurrences at the bottom of the prompt or wherever bracketed
+      updatedText = updatedText.split("[Paste Task Here]").join(taskVal);
+      updatedText = updatedText.split("[Paste Source Content Here]").join(sourceVal);
+      
+      displayPrompt.textContent = updatedText;
+    }
+
+    taskInput.addEventListener('input', updateDisplay);
+    sourceInput.addEventListener('input', updateDisplay);
+
+    function copyText(elementId, btn) {
+      const text = document.getElementById(elementId).textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const btnText = btn.querySelector('.button-text');
+        const prevText = btnText.textContent;
+        btnText.textContent = 'Copied!';
+        btn.classList.add('copied');
+        
+        setTimeout(() => {
+          btnText.textContent = prevText;
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
